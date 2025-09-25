@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affine Cipher</title>
+<style>
+    body { font-family: Arial; background: #ffeaa7; display:flex; justify-content:center; align-items:center; height:100vh;}
+    .container { background:white; padding:30px; border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,0.2); width:400px; text-align:center;}
+    input, textarea { width:100%; padding:10px; margin:10px 0; border-radius:8px; border:1px solid #ccc; }
+    button { padding:10px 20px; border:none; border-radius:8px; background-color:#fd79a8; color:white; cursor:pointer; margin:5px;}
+    button:hover { background-color:#e84393; }
+    h2 { margin-bottom:20px;}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Affine Cipher</h2>
+<textarea id="text" rows="3" placeholder="Nhập văn bản"></textarea>
+<input type="number" id="a" placeholder="Khóa a (1,3,5...)">
+<input type="number" id="b" placeholder="Khóa b (0-25)">
+<br>
+<button onclick="encrypt()">Mã hoá</button>
+<button onclick="decrypt()">Giải mã</button>
+<h3>Kết quả:</h3>
+<textarea id="result" rows="3" readonly></textarea>
+</div>
+
+<script>
+function modInverse(a,m){
+    a = a % m;
+    for(let x=1;x<m;x++)
+        if((a*x)%m===1) return x;
+    return 1;
+}
+function affine(text,a,b,encrypt=true){
+    let result="";
+    let a_inv = modInverse(a,26);
+    for(let c of text){
+        if(c.match(/[a-z]/i)){
+            let code = c.charCodeAt(0);
+            let base = c===c.toUpperCase()?65:97;
+            if(encrypt) result += String.fromCharCode((a*(code-base)+b)%26 + base);
+            else result += String.fromCharCode((a_inv*((code-base - b +26))%26) + base);
+        } else result += c;
+    }
+    return result;
+}
+function encrypt(){
+    let text=document.getElementById('text').value;
+    let a=parseInt(document.getElementById('a').value);
+    let b=parseInt(document.getElementById('b').value);
+    document.getElementById('result').value=affine(text,a,b,true);
+}
+function decrypt(){
+    let text=document.getElementById('text').value;
+    let a=parseInt(document.getElementById('a').value);
+    let b=parseInt(document.getElementById('b').value);
+    document.getElementById('result').value=affine(text,a,b,false);
+}
+</script>
+</body>
+</html>
